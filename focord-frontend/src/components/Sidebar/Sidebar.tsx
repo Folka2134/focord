@@ -1,11 +1,11 @@
 import { ConversationList } from "./ConversationList";
+import { UserDetails } from "./UserDetails";
 
 export const SideBar = () => {
   return (
-    <div className="h-screen w-1/5 border-r">
-      <h1 className="text-2xl font-bold">Sidebar</h1>
+    <div className="flex h-screen w-1/5 flex-col justify-between border-r">
       <ConversationList />
-      {/* <UserDetails /> */}
+      <UserDetails />
     </div>
   );
 };
