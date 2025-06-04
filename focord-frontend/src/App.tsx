@@ -1,12 +1,12 @@
 import "./App.css";
-import { ChatSection } from "./components/ChatSection/ChatSection";
+import { MainSection } from "./components/MainSection/MainSection";
 import { SideBar } from "./components/Sidebar/Sidebar";
 
 function App() {
   return (
     <div className="flex h-screen">
       <SideBar />
-      <ChatSection />
+      <MainSection />
     </div>
   );
 }

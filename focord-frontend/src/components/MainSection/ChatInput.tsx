@@ -1,7 +1,8 @@
+// TODO: Create a send message function and handle input submission
 export const ChatInput = () => {
   return (
     <div className="flex w-full items-center border-t p-4">
-      <h1>Chat input</h1>
+      {/* TODO: Add send on enter functionality */}
       <input
         type="text"
         placeholder="Type your message here..."
