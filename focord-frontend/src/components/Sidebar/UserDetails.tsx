@@ -1,14 +1,18 @@
+import { useAuth } from "@/context/AuthContext";
 import { Avatar } from "./Avatar";
+import { SignOutButton } from "@clerk/clerk-react";
 
 export const UserDetails = () => {
+  const { user } = useAuth();
+
   return (
-    <div className="p-4">
-      <h2 className="mb-4 text-xl font-semibold">User Details</h2>
+    <div className="bg-[#202020] p-6">
       <div className="flex items-center space-x-4">
-        <Avatar />
+        <Avatar user={user} />
         <div>
-          <h3 className="text-lg font-medium">Username</h3>
+          <h3 className="text-lg font-medium">{user?.fullName}</h3>
         </div>
+        <SignOutButton />
       </div>
     </div>
   );

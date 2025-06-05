@@ -1,16 +1,31 @@
+import { useUser } from "@clerk/clerk-react";
+import type { UserResource } from "@clerk/types";
 import { createContext, useContext } from "react";
 
-// TODO: Auth context
-const AuthContext = createContext(null);
-
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { user, isSignedIn, isLoaded } = useUser();
-
-  return (
-    <AuthContext.Provider value={{ user, isSignedIn, isLoaded }}>
-      {children}
-    </AuthContext.Provider>
-  );
+type AuthContextType = {
+  user: UserResource | null;
+  isSignedIn: boolean;
+  isLoaded: boolean;
 };
 
-export const useAuth = () => useContext(AuthContext);
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const { user, isSignedIn = false, isLoaded } = useUser();
+
+  const value = {
+    user: user ?? null,
+    isSignedIn,
+    isLoaded,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};
