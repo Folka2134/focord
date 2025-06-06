@@ -2,7 +2,7 @@ import { ChatSection } from "./ChatSection";
 import { FriendList } from "./FriendList";
 
 export const MainSection = () => {
-  // TODO: Check context for selected conversation
+  // TODO: CONTEXT: Check context for selected conversation
   const selectedConversation = true; // Placeholder for selected conversation state
 
   return (

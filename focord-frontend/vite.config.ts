@@ -11,4 +11,8 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    // Replace with your ngrok host
+    allowedHosts: ["https://focord.vercel.app"],
+  },
 });

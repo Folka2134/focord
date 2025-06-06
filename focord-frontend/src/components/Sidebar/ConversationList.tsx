@@ -5,6 +5,7 @@ export const ConversationList = () => {
     <div className="p-4">
       <h2 className="mb-4 text-xl font-semibold">Conversations</h2>
       <ul className="space-y-2">
+        {/* TODO: CONTEXT: Fetch and map over conversations */}
         <ConversationItem />
       </ul>
     </div>

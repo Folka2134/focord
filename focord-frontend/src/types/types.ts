@@ -1,8 +1,13 @@
+import type { UserResource } from "@clerk/types";
+
 export interface User {
   id: string;
+  clerkId: string;
   username: string;
   avatarUrl: string;
   status: "online" | "offline" | "away" | "busy";
+  friendIds: string[];
+  clerkInfo: UserResource; // Clerk user resource for additional user info
 }
 
 export interface Message {
@@ -17,9 +22,8 @@ export interface Message {
 export interface Conversation {
   id: string;
   title: string;
-  participants: User[];
-  messages: Message[];
-  lastMessage: Message | null; // The last message in the conversation
+  participantIds: string[];
+  lastMessage?: string;
   createdAt: Date; // Timestamp when the conversation was created
   updatedAt: Date; // Timestamp when the conversation was last updated
   isGroup: boolean; // Indicates if the conversation is a group chat

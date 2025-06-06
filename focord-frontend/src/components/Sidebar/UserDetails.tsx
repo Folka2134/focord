@@ -1,5 +1,5 @@
 import { useAuth } from "@/context/AuthContext";
-import { Avatar } from "./Avatar";
+// import { Avatar } from "./Avatar";
 import { SignOutButton } from "@clerk/clerk-react";
 
 export const UserDetails = () => {
@@ -8,7 +8,7 @@ export const UserDetails = () => {
   return (
     <div className="bg-[#202020] p-6">
       <div className="flex items-center space-x-4">
-        <Avatar user={user} />
+        {/* <Avatar user={user} /> */}
         <div>
           <h3 className="text-lg font-medium">{user?.fullName}</h3>
         </div>

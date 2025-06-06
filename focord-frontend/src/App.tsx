@@ -3,6 +3,7 @@ import "./App.css";
 import { MainSection } from "./components/MainSection/MainSection";
 import { SideBar } from "./components/Sidebar/Sidebar";
 import { SignIn } from "./components/Authentication/SignIn";
+import { UserInitializer } from "./components/Authentication/UserInitializer";
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <SignIn />
       </SignedOut>
       <SignedIn>
+        <UserInitializer />
         <SideBar />
         <MainSection />
       </SignedIn>
