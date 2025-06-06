@@ -4,8 +4,10 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/index.ts",
+    "prebuild": "npm install",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "postbuild": "ls -la dist/"
   },
   "keywords": [],
   "author": "",
@@ -13,11 +15,11 @@
   "description": "",
   "dependencies": {
     "@clerk/express": "^1.6.0",
-    "express": "^4.21.2",
-    "nodemon": "^3.1.10"
+    "express": "^4.21.2"
   },
   "devDependencies": {
     "@types/express": "^4.17.22",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "nodemon": "^3.1.10"
   }
 }
