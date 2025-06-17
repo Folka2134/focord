@@ -1,27 +1,33 @@
 import bcrypt from "bcryptjs";
 import User from "../models/user.model";
 import { generateToken } from "../lib/utils";
+import { Request, Response } from "express";
 
-export const signup = async (req: any, res: any) => {
-  const { fullName, userName, email, password, avatarUrl } = req.body;
+export const signup = async (req: Request, res: Response): Promise<void> => {
+  const { fullName, userName, email, password } = req.body;
   try {
     if (!fullName || !userName || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+      res.status(400).json({ message: "All fields are required" });
+      return;
     }
+
     if (password.length < 6) {
-      return res
+      res
         .status(400)
         .json({ message: "Password must be atleast 6 characters long" });
+      return;
     }
 
     const existingUserEmail = await User.findOne({ email });
     if (existingUserEmail) {
-      return res.status(400).json({ message: "Email already exists" });
+      res.status(400).json({ message: "Email already exists" });
+      return;
     }
-    // Check if username already exists
+
     const exisintUserName = await User.findOne({ userName });
     if (exisintUserName) {
-      return res.status(400).json({ message: "Username already exists" });
+      res.status(400).json({ message: "Username already exists" });
+      return;
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -32,7 +38,6 @@ export const signup = async (req: any, res: any) => {
       userName,
       email,
       password: hashedPassword,
-      avatarUrl,
     });
 
     if (newUser) {
@@ -44,7 +49,6 @@ export const signup = async (req: any, res: any) => {
         fullName: newUser.fullName,
         userName: newUser.userName,
         email: newUser.email,
-        avatarUrl: newUser.avatarUrl,
       });
     } else {
       res.status(400).json({ message: "User creation failed" });
@@ -55,10 +59,49 @@ export const signup = async (req: any, res: any) => {
   }
 };
 
-export const login = (req: any, res: any) => {
-  res.send("Login Page");
+export const login = async (req: Request, res: Response): Promise<void> => {
+  const { email, password } = req.body;
+  try {
+    if (!email || !password) {
+      res.status(400).json({ message: "All fields are required" });
+      return;
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      res.status(400).json({ message: "Invalid credentials" });
+      return;
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
+      res.status(400).json({ message: "Invalid credentials" });
+      return;
+    }
+
+    generateToken(user._id, res);
+
+    res.status(200).json({
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      userName: user.userName,
+      avatarUrl: user.avatarUrl,
+    });
+  } catch (error) {
+    console.log("Error in login controller", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
-export const logout = (req: any, res: any) => {
-  res.send("Logout Page");
+export const logout = (req: Request, res: Response) => {
+  try {
+    res.cookie("jwt", "", { maxAge: 0 });
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    console.log("Error in logout controller", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
+
+export const updateProfile = (req: any, res: any) => {};
