@@ -4,12 +4,6 @@ import User from "../models/user.model";
 import { generateToken } from "../lib/utils/generateToken";
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
-  // Pull user data from req
-  // Validate user inputs based on model requirements (unique, minlength, etc)
-  // Hash password
-  // Create user using user inputs and hashed password
-  // Generate jwt token (sends via cookie)
-  // Save user to database
   const { fullName, userName, email, password } = req.body;
 
   try {
@@ -58,14 +52,50 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       res.status(400).json({ message: "Failed to create user" });
     }
   } catch (error) {
+    console.log("Error in the login controller");
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
 export const login = async (req: Request, res: Response): Promise<void> => {
-  res.send("Login page");
+  const { email, password } = req.body;
+  try {
+    if (!email || !password) {
+      res.status(400).json({ message: "All fields must be filled" });
+      return;
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      res.status(400).json({ message: "Invalid credentials" });
+      return;
+    }
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
+      res.status(400).json({ message: "Invalid credentials" });
+      return;
+    }
+
+    generateToken(user._id, res);
+
+    res.status(201).json({
+      _id: user._id,
+      fullName: user.fullName,
+      userName: user.userName,
+      email: user.email,
+      avatarUrl: user.avatarUrl,
+    });
+  } catch (error) {
+    console.log("Error in the login controller");
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 export const logout = async (req: Request, res: Response): Promise<void> => {
-  res.send("Logout page");
+  try {
+    res.cookie("jwt", "", { maxAge: 0 });
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    console.log("Error in the login controller");
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
