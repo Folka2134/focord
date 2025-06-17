@@ -10,7 +10,6 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
   // Create user using user inputs and hashed password
   // Generate jwt token (sends via cookie)
   // Save user to database
-
   const { fullName, userName, email, password } = req.body;
 
   try {
