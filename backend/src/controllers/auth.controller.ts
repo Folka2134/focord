@@ -1,7 +1,9 @@
 import bcrypt from "bcryptjs";
+import { Request, Response } from "express";
+
 import User from "../models/user.model";
 import { generateToken } from "../lib/utils";
-import { Request, Response } from "express";
+import cloudinary from "../lib/cloudinary";
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
   const { fullName, userName, email, password } = req.body;
@@ -104,4 +106,38 @@ export const logout = (req: Request, res: Response) => {
   }
 };
 
-export const updateProfile = (req: any, res: any) => {};
+export const updateProfile = async (req: any, res: any) => {
+  const { avatarUrl } = req.body;
+  try {
+    const userId = req.user._id;
+
+    if (!avatarUrl) {
+      res.status(400).json({ message: "Avatar URL is required" });
+    }
+
+    const uploadApiResponse = await cloudinary.uploader.upload(avatarUrl);
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        avatarUrl: uploadApiResponse.secure_url,
+      },
+      { new: true },
+    );
+
+    res
+      .status(200)
+      .json({ message: "Profile updated successfully", user: updatedUser });
+  } catch (error) {
+    console.log("Error in logout controller", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const checkAuth = (req: Request, res: Response) => {
+  try {
+    res.status(200).json(req.user);
+  } catch (error) {
+    console.log("Error in logout controller", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
