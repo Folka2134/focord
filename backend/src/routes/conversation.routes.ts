@@ -1,5 +1,7 @@
 import express from "express";
 import {
+  addParticipants,
+  createConversation,
   getAllConversations,
   getConversationMessages,
 } from "../controllers/conversation.controller";
@@ -9,5 +11,7 @@ const router = express.Router();
 
 router.get("/", protectedRoute, getAllConversations);
 router.get("/:id", protectedRoute, getConversationMessages);
+router.post("/create", protectedRoute, createConversation);
+router.put("/:id/add", protectedRoute, addParticipants);
 
 export default router;

@@ -10,8 +10,10 @@ export const getAllConversations = async (
   // Get currentUser
   // Get all conversations that include currentUser
   try {
-    const currentUser = req.user;
-    const userConversations = await Conversation.find({ currentUser });
+    const currentUserId = req.user!._id;
+    const userConversations = await Conversation.find({
+      participants: currentUserId,
+    });
 
     res.status(200).json(userConversations);
   } catch (error) {
@@ -120,4 +122,61 @@ export const createConversation = async (
   }
 };
 
-export const addParticipants = async (req: Request, res: Response) => {};
+export const addParticipants = async (req: Request, res: Response) => {
+  try {
+    const { participants } = req.body;
+    const { conversationId } = req.params;
+
+    if (!participants || participants.length === 0) {
+      res.status(400).json({ message: "Select atleast 1 participant" });
+      return;
+    }
+
+    const validParticipants = await User.find({ _id: { $in: participants } });
+    if (validParticipants.length !== participants.length) {
+      res.status(400).json({ message: "Some participants are invalid users" });
+      return;
+    }
+    const validParticipantIds = validParticipants.map((participant) =>
+      participant._id.toString(),
+    );
+
+    const conversation = await Conversation.findOne({ conversationId });
+    if (!conversation) {
+      res.status(400).json({ message: "Conversation not found" });
+      return;
+    }
+
+    const existingParticipants = conversation.participants.map((participant) =>
+      participant.toString(),
+    );
+
+    const newParticipants = validParticipantIds.filter((participant: any) => {
+      return !existingParticipants.includes(participant.toString());
+    });
+
+    if (!newParticipants || newParticipants.length == 0) {
+      res.status(400).json({ message: "Select atleast 1 new participant" });
+      return;
+    }
+
+    const allParticipants = [
+      ...new Set([...existingParticipants, ...newParticipants]),
+    ];
+
+    const updatedConversation = await Conversation.findOneAndUpdate(
+      { conversationId },
+      { participants: allParticipants },
+      { new: true },
+    );
+
+    res.status(200).json({
+      message: "Participants added successfully",
+      conversation: updatedConversation,
+      addedParticipants: newParticipants,
+    });
+  } catch (error) {
+    console.error("Error in addParticipants controller", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
