@@ -107,22 +107,42 @@ export const logout = (req: Request, res: Response) => {
 };
 
 export const updateProfile = async (req: any, res: any) => {
-  const { avatarUrl } = req.body;
+  const { avatarUrl, userName } = req.body;
   try {
     const userId = req.user._id;
 
-    if (!avatarUrl) {
-      res.status(400).json({ message: "Avatar URL is required" });
+    if (!avatarUrl && !userName) {
+      res.status(400).json({ message: "At least one field is required" });
     }
 
-    const uploadApiResponse = await cloudinary.uploader.upload(avatarUrl);
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      {
-        avatarUrl: uploadApiResponse.secure_url,
-      },
-      { new: true },
-    );
+    const updateData: any = {};
+
+    if (avatarUrl) {
+      const uploadApiResponse = await cloudinary.uploader.upload(avatarUrl);
+      updateData.avatarUrl = uploadApiResponse.secure_url;
+    }
+
+    if (userName) {
+      const newUserName = userName.trim();
+
+      const existingUserName = await User.findOne({
+        userName: newUserName.toLowerCase(),
+        _id: { $ne: userId },
+      });
+      if (existingUserName) {
+        res.status(400).json({ message: "User is already taken" });
+      }
+
+      updateData.userName = newUserName;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+    });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
     res
       .status(200)
