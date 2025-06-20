@@ -180,3 +180,44 @@ export const addParticipants = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const leaveConversation = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  // Validate user
+  // Validate conversation
+  // Remove user from conversation participants
+  // Update conversation
+  try {
+    const { conversationId } = req.params;
+    const userId = req.user!._id;
+
+    const conversation = await Conversation.findOne({ conversationId });
+    if (!conversation) {
+      res.status(404).json({ message: "Conversation not found" });
+      return;
+    }
+
+    const existingParticipants = conversation.participants.map((participant) =>
+      participant.toString(),
+    );
+    const updatedParticipants = existingParticipants.filter((id) => {
+      return id != userId;
+    });
+
+    const updatedConversation = await Conversation.findOneAndUpdate(
+      { conversationId },
+      { participants: updatedParticipants },
+      { new: true },
+    );
+
+    res.status(200).json({
+      message: "Participant left the conversation",
+      conversation: updatedConversation,
+    });
+  } catch (error) {
+    console.error("Error in leaveConversation controller", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
