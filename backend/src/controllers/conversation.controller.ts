@@ -221,3 +221,39 @@ export const leaveConversation = async (
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const updateName = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  // Grab conversationId from params
+  // Grab name from body
+  // Validate conversation
+  // Update conversation with new name
+  try {
+    const { conversationId } = req.params;
+    const { name } = req.body;
+
+    const conversation = await Conversation.findOne({ conversationId });
+    if (!conversation) {
+      res.status(404).json({ message: "Unable to find conversation" });
+      return;
+    }
+
+    const updatedConversation = await Conversation.findOneAndUpdate(
+      { conversationId },
+      { name: name },
+      { new: true },
+    );
+
+    res
+      .status(200)
+      .json({
+        message: "Conversation name updated",
+        conversation: updatedConversation,
+      });
+  } catch (error) {
+    console.error("Error in updateName controller", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
