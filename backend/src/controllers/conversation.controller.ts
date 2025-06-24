@@ -30,11 +30,11 @@ export const getConversationMessages = async (
   // Find all messages from current conversation
   try {
     const { conversationId } = req.params;
+
     const conversationMessages = await Message.find({
       conversation: conversationId,
     })
       .populate("senderId", "userName avatarUrl")
-      .populate("receiverId", "userName avatarUrl")
       .sort({ createdAt: 1 });
 
     res.status(200).json(conversationMessages);
@@ -246,12 +246,10 @@ export const updateName = async (
       { new: true },
     );
 
-    res
-      .status(200)
-      .json({
-        message: "Conversation name updated",
-        conversation: updatedConversation,
-      });
+    res.status(200).json({
+      message: "Conversation name updated",
+      conversation: updatedConversation,
+    });
   } catch (error) {
     console.error("Error in updateName controller", error);
     res.status(500).json({ message: "Internal server error" });

@@ -8,9 +8,12 @@ const messageSchema = new Schema(
       required: true,
     },
     senderId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    receiverId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    textContent: { type: String },
-    image: { type: String },
+    messageType: {
+      type: String,
+      enum: ["text", "image", "file"],
+      required: true,
+    },
+    content: { type: String, required: true },
   },
   { timestamps: true },
 );
