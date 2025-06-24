@@ -126,6 +126,7 @@ export const addParticipants = async (req: Request, res: Response) => {
   try {
     const { participants } = req.body;
     const { conversationId } = req.params;
+    console.log(conversationId);
 
     if (!participants || participants.length === 0) {
       res.status(400).json({ message: "Select atleast 1 participant" });
@@ -141,7 +142,7 @@ export const addParticipants = async (req: Request, res: Response) => {
       participant._id.toString(),
     );
 
-    const conversation = await Conversation.findOne({ conversationId });
+    const conversation = await Conversation.findById(conversationId);
     if (!conversation) {
       res.status(400).json({ message: "Conversation not found" });
       return;
@@ -164,8 +165,8 @@ export const addParticipants = async (req: Request, res: Response) => {
       ...new Set([...existingParticipants, ...newParticipants]),
     ];
 
-    const updatedConversation = await Conversation.findOneAndUpdate(
-      { conversationId },
+    const updatedConversation = await Conversation.findByIdAndUpdate(
+      conversationId,
       { participants: allParticipants },
       { new: true },
     );
@@ -193,7 +194,7 @@ export const leaveConversation = async (
     const { conversationId } = req.params;
     const userId = req.user!._id;
 
-    const conversation = await Conversation.findOne({ conversationId });
+    const conversation = await Conversation.findById(conversationId);
     if (!conversation) {
       res.status(404).json({ message: "Conversation not found" });
       return;
@@ -206,8 +207,8 @@ export const leaveConversation = async (
       return id != userId;
     });
 
-    const updatedConversation = await Conversation.findOneAndUpdate(
-      { conversationId },
+    const updatedConversation = await Conversation.findByIdAndUpdate(
+      conversationId,
       { participants: updatedParticipants },
       { new: true },
     );
@@ -234,14 +235,14 @@ export const updateName = async (
     const { conversationId } = req.params;
     const { name } = req.body;
 
-    const conversation = await Conversation.findOne({ conversationId });
+    const conversation = await Conversation.findById(conversationId);
     if (!conversation) {
       res.status(404).json({ message: "Unable to find conversation" });
       return;
     }
 
-    const updatedConversation = await Conversation.findOneAndUpdate(
-      { conversationId },
+    const updatedConversation = await Conversation.findByIdAndUpdate(
+      conversationId,
       { name: name },
       { new: true },
     );

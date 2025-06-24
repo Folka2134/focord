@@ -12,10 +12,10 @@ import { protectedRoute } from "../middleware/auth.middleware";
 const router = express.Router();
 
 router.get("/", protectedRoute, getAllConversations);
-router.get("/:id", protectedRoute, getConversationMessages);
+router.get("/:conversationId", protectedRoute, getConversationMessages);
 router.post("/create", protectedRoute, createConversation);
-router.put("/:id/add", protectedRoute, addParticipants);
-router.put("/:id/leave", protectedRoute, leaveConversation);
-router.put("/:id/update-name", protectedRoute, updateName);
+router.put("/:conversationId/add", protectedRoute, addParticipants);
+router.put("/:conversationId/leave", protectedRoute, leaveConversation);
+router.put("/:conversationId/update-name", protectedRoute, updateName);
 
 export default router;
