@@ -30,6 +30,18 @@ export const getConversationMessages = async (
   // Find all messages from current conversation
   try {
     const { conversationId } = req.params;
+    const userId = req.user!._id;
+
+    const conversation = await Conversation.findOne({
+      _id: conversationId,
+      participants: userId,
+    });
+    if (!conversation) {
+      res
+        .status(403)
+        .json({ message: "Conversation not found or unauthorized" });
+      return;
+    }
 
     const conversationMessages = await Message.find({
       conversation: conversationId,

@@ -30,19 +30,16 @@ export const sendMessage = async (
       return;
     }
 
-    const conversation = await Conversation.findById(conversationId);
+    const conversation = await Conversation.findOne({
+      _id: conversationId,
+      participants: userId,
+    });
     if (!conversation) {
-      res.status(400).json({ message: "Conversation not found" });
+      res
+        .status(400)
+        .json({ message: "Conversation not found or unauthorized" });
       return;
     }
-
-    // TODO: Validate user is in conversation
-    // if (!conversation.participants.includes(userId)) {
-    //   res
-    //     .status(403)
-    //     .json({ message: "You are not a participant in this conversation" });
-    //   return;
-    // }
 
     let finalContent = content;
 
@@ -66,7 +63,7 @@ export const sendMessage = async (
 
     const newMessage = new Message(messageData);
     const savedMessage = await newMessage.save();
-    await savedMessage.populate("senderId", "username avatar");
+    await savedMessage.populate("senderId", "userName avatarUrl");
 
     // TODO: Implment socket.io
     // emit message to socket.io
@@ -82,7 +79,10 @@ export const sendMessage = async (
   }
 };
 
-export const deleteMessage = async (req: Request, res: Response) => {
+export const deleteMessage = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   // Grab message id from params
   // Validate message
   // delete message from database
@@ -108,7 +108,10 @@ export const deleteMessage = async (req: Request, res: Response) => {
   }
 };
 
-export const editMessage = async (req: Request, res: Response) => {
+export const editMessage = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   // Grab message id from params
   // Validate message
   // Update message
