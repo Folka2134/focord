@@ -81,3 +81,48 @@ export const sendMessage = async (
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const deleteMessage = async (req: Request, res: Response) => {
+  // Grab message id from params
+  // Validate message
+  // delete message from database
+  // response
+  try {
+    const { messageId } = req.params;
+    const userId = req.user!._id;
+
+    const deletedMessage = await Message.findOneAndDelete({
+      _id: messageId,
+      senderId: userId,
+    });
+
+    if (!deletedMessage) {
+      res.status(404).json({ message: "Message not found or unauthorized" });
+      return;
+    }
+
+    res.status(200).json({ message: "Message deleted successfully" });
+  } catch (error) {
+    console.error("Error in deleteMessage controller", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// TODO: Implement edit message controller
+export const editMessage = async (req: Request, res: Response) => {
+  // Grab message id from params
+  // Validate message
+  // Update message
+  // response
+  try {
+    const { messageId } = req.params;
+    const userId = req.user!._id;
+
+    const message = await Message.findOne({
+      _id: messageId,
+      senderId: userId,
+    });
+    if (!message) {
+    }
+  } catch (error) {}
+};
