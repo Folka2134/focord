@@ -108,7 +108,6 @@ export const deleteMessage = async (req: Request, res: Response) => {
   }
 };
 
-// TODO: Implement edit message controller
 export const editMessage = async (req: Request, res: Response) => {
   // Grab message id from params
   // Validate message
@@ -117,12 +116,42 @@ export const editMessage = async (req: Request, res: Response) => {
   try {
     const { messageId } = req.params;
     const userId = req.user!._id;
+    const { content } = req.body;
+
+    if (!content) {
+      res.status(400).json({ message: "Content is required" });
+      return;
+    }
 
     const message = await Message.findOne({
       _id: messageId,
       senderId: userId,
     });
     if (!message) {
+      res.status(404).json({ message: "Message not found or unauthorized" });
+      return;
     }
-  } catch (error) {}
+
+    if (message.messageType != "text") {
+      res.status(400).json({ message: "Only text messages can be edited" });
+      return;
+    }
+
+    const updatedMessage = await Message.findByIdAndUpdate(
+      messageId,
+      {
+        content: content,
+      },
+      {
+        new: true,
+      },
+    ).populate("senderId", "username avatar");
+
+    res
+      .status(200)
+      .json({ message: "Message updated successfully", data: updatedMessage });
+  } catch (error) {
+    console.error("Error in updateMessage controller", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
