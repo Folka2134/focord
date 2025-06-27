@@ -1,5 +1,6 @@
 import { ConversationList } from "./ConversationList";
 import { UserDetails } from "./UserDetails";
+// import { UserDetails } from "./UserDetails";
 
 export const SideBar = () => {
   return (
